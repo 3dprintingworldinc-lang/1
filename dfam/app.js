@@ -256,7 +256,7 @@ function updateRadar() {
     const y = center.y + Math.sin(a) * r;
     dpts += `${x},${y} `;
   }
-  svgInner += `<polygon points="${dpts.trim()}" fill="rgba(11, 42, 74, 0.18)" stroke="#1E5AA8" stroke-width="1.8"/>`;
+  svgInner += `<polygon points="${dpts.trim()}" fill="rgba(30, 63, 160, 0.18)" stroke="#3556C8" stroke-width="1.8"/>`;
 
   svg.innerHTML = svgInner;
 }
@@ -373,13 +373,13 @@ modTabs.forEach(t => t.addEventListener('click', () => {
   function drawPart(mode) {
     if (mode === 'bad') {
       partG.innerHTML = `
-        <rect x="60" y="100" width="240" height="60" fill="none" stroke="#B23035" stroke-width="1.5"/>
+        <rect x="60" y="100" width="240" height="60" fill="none" stroke="#C8102E" stroke-width="1.5"/>
         <rect x="60" y="100" width="240" height="60" fill="url(#layers)"/>
-        <line x1="100" y1="100" x2="100" y2="160" stroke="#B23035" stroke-dasharray="2 3"/>
-        <line x1="160" y1="100" x2="160" y2="160" stroke="#B23035" stroke-dasharray="2 3"/>
-        <line x1="220" y1="100" x2="220" y2="160" stroke="#B23035" stroke-dasharray="2 3"/>
-        <path d="M130 100 q4 30 -4 60" stroke="#B23035" stroke-width="2.5" fill="none"/>
-        <text x="135" y="92" font-family="ui-monospace, monospace" font-size="10" fill="#B23035">CRACK</text>`;
+        <line x1="100" y1="100" x2="100" y2="160" stroke="#C8102E" stroke-dasharray="2 3"/>
+        <line x1="160" y1="100" x2="160" y2="160" stroke="#C8102E" stroke-dasharray="2 3"/>
+        <line x1="220" y1="100" x2="220" y2="160" stroke="#C8102E" stroke-dasharray="2 3"/>
+        <path d="M130 100 q4 30 -4 60" stroke="#C8102E" stroke-width="2.5" fill="none"/>
+        <text x="135" y="92" font-family="ui-monospace, monospace" font-size="10" fill="#C8102E">CRACK</text>`;
     } else if (mode === 'mid') {
       partG.innerHTML = `
         <g transform="translate(180 130) rotate(-22)">
@@ -394,7 +394,7 @@ modTabs.forEach(t => t.addEventListener('click', () => {
           <path d="M-130 30 L-110 -30 L110 -30 L130 30 Z" fill="url(#layers)"/>
           <line x1="-60" y1="-30" x2="-60" y2="30" stroke="#167C4A" stroke-width="0.8" stroke-dasharray="2 3"/>
           <line x1="60"  y1="-30" x2="60"  y2="30" stroke="#167C4A" stroke-width="0.8" stroke-dasharray="2 3"/>
-          <line x1="0"   y1="-30" x2="0"   y2="30" stroke="#1E5AA8" stroke-width="1.5"/>
+          <line x1="0"   y1="-30" x2="0"   y2="30" stroke="#3556C8" stroke-width="1.5"/>
         </g>`;
     }
   }
@@ -609,7 +609,7 @@ modTabs.forEach(t => t.addEventListener('click', () => {
     if (sup > 1.5) {
       for (let i = 0; i < Math.min(20, sup * 2); i++) {
         const x = 110 + i * 8;
-        supSvg += `<line x1="${x}" y1="240" x2="${x}" y2="${240 - 6 - sup * 1.5}" stroke="#B23035" stroke-width="0.7"/>`;
+        supSvg += `<line x1="${x}" y1="240" x2="${x}" y2="${240 - 6 - sup * 1.5}" stroke="#C8102E" stroke-width="0.7"/>`;
       }
     }
     supports.innerHTML = supSvg;
@@ -618,7 +618,7 @@ modTabs.forEach(t => t.addEventListener('click', () => {
     let layerSvg = '';
     const lh = 4;
     for (let y = 60; y < 240; y += lh) {
-      layerSvg += `<line x1="40" y1="${y}" x2="320" y2="${y}" stroke="#1E5AA8" stroke-width="0.15" stroke-opacity="0.35"/>`;
+      layerSvg += `<line x1="40" y1="${y}" x2="320" y2="${y}" stroke="#3556C8" stroke-width="0.15" stroke-opacity="0.35"/>`;
     }
     layers.innerHTML = layerSvg;
 
