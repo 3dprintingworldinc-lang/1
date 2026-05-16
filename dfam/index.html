@@ -312,7 +312,94 @@
 
 <!-- ============================================================ MODULE -->
 <section class="view" id="view-module">
-  <div class="mod-grid">
+
+  <!-- Module tab bar -->
+  <div class="mod-tabs" id="mod-tabs">
+    <button data-mod="1" class="mtab active"><span>01</span>Mindset</button>
+    <button data-mod="2" class="mtab"><span>02</span>Applications</button>
+    <button data-mod="3" class="mtab"><span>03</span>Process / Material</button>
+    <button data-mod="4" class="mtab"><span>04</span>Design</button>
+    <button data-mod="5" class="mtab"><span>05</span>Use cases</button>
+    <button data-mod="6" class="mtab"><span>06</span>Validation</button>
+    <button data-mod="7" class="mtab"><span>07</span>Business case</button>
+  </div>
+
+  <!-- ===== Module 1 — Mindset ===== -->
+  <div class="mod-grid mod-body" data-mod="1">
+    <aside class="mod-outline">
+      <div class="kicker">Module 1</div>
+      <h3>The DfAM Mindset</h3>
+      <div class="key-q">What changes when we design for additive instead of just printing existing parts?</div>
+      <ul class="outline-list">
+        <li class="done">1.0 Module brief</li>
+        <li class="done">1.1 Material ≠ performance</li>
+        <li class="done">1.2 Function-first thinking</li>
+        <li class="active">1.3 Exercise: Same envelope, two designs</li>
+        <li>1.4 Knowledge check</li>
+        <li>1.5 Debrief</li>
+      </ul>
+    </aside>
+
+    <section class="mod-canvas">
+      <div class="canvas-head">
+        <h2>Exercise · Same envelope, two designs</h2>
+        <p>One bracket. Same load, same envelope. Slide the dial between <em>material-first</em> and <em>function-first</em> thinking. Watch which approach survives.</p>
+      </div>
+
+      <div class="mindset">
+        <div class="mindset-slider-wrap">
+          <span class="ms-end ms-red">Material-first</span>
+          <input id="mindset-slider" type="range" min="0" max="100" value="20" class="ms-slider"/>
+          <span class="ms-end ms-green">Function-first</span>
+        </div>
+
+        <div class="mindset-grid">
+          <div class="mindset-panel" id="ms-panel-left">
+            <div class="kicker">Approach</div>
+            <h3 id="ms-approach-title">Premium material · same legacy geometry</h3>
+            <p id="ms-approach-body">The team upgrades to PEEK and prints the original bracket as-drawn. Load runs perpendicular to layers. Sharp corners remain. No supports planned.</p>
+            <ul class="ms-attr-list" id="ms-attr-list"></ul>
+          </div>
+
+          <div class="mindset-panel viz">
+            <svg viewBox="0 0 360 240" id="ms-viz">
+              <defs>
+                <pattern id="layers" patternUnits="userSpaceOnUse" width="6" height="6" patternTransform="rotate(0)">
+                  <line x1="0" y1="0" x2="6" y2="0" stroke="#3a8dff" stroke-width="0.4" stroke-opacity="0.5"/>
+                </pattern>
+              </defs>
+              <g id="ms-part"></g>
+              <g id="ms-arrows"></g>
+              <g id="ms-stress"></g>
+              <text x="14" y="226" font-family="ui-monospace, monospace" font-size="10" fill="#9aa5b3" id="ms-caption">Load ⟂ layer plane · Kt = 3.2</text>
+            </svg>
+          </div>
+        </div>
+
+        <div class="mindset-result">
+          <div class="result-box">
+            <div class="card-title">Predicted outcome</div>
+            <div class="result-num" id="ms-result-num">38<span>%</span></div>
+            <div class="result-lbl" id="ms-result-lbl">of rated load before failure · cracked at layer interface</div>
+          </div>
+          <div class="verdict" id="ms-verdict">
+            <span class="tag tag-red">Failed</span> material was upgraded · design was not
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <aside class="mod-right">
+      <div class="card-title">Why this matters</div>
+      <p class="hint">A high-performance material does not rescue a high-stress orientation, a sharp corner, or an unplanned layer interface. <em>Material creates potential. Design determines whether that potential becomes performance.</em></p>
+      <div class="card-title" style="margin-top:18px">Reflection</div>
+      <textarea class="reflect" rows="4" placeholder="When have you seen a team blame material for a design failure?"></textarea>
+      <button class="btn btn-ghost full">Save reflection · capstone hand-off →</button>
+    </aside>
+  </div>
+
+  <!-- ===== Module 2 — Applications (existing sorter) ===== -->
+  <div class="mod-grid mod-body" data-mod="2" hidden>
     <aside class="mod-outline">
       <div class="kicker">Module 2</div>
       <h3>Finding the Right Applications</h3>
@@ -333,7 +420,6 @@
         <h2>Exercise · AM Candidate Sorting</h2>
         <p>Drag each candidate part into one bin. The opportunity radar updates live. Submit when you're confident.</p>
       </div>
-
       <div class="sorter">
         <div class="tray" id="tray" aria-label="Candidate tray"></div>
         <div class="bins" id="bins">
@@ -343,7 +429,6 @@
           <div class="bin" data-bin="strategic"><div class="bin-head">Strategic</div></div>
         </div>
       </div>
-
       <div class="sorter-bottom">
         <button class="btn btn-ghost" id="reset-sorter">Reset</button>
         <span class="sort-status" id="sort-status">0 of 8 sorted</span>
@@ -357,6 +442,417 @@
       <div class="card-title" style="margin-top:18px">Top 3 strongest</div>
       <ol class="top3" id="top3"></ol>
       <button class="btn btn-ghost full" style="margin-top:14px">Send results to capstone Step 1 →</button>
+    </aside>
+  </div>
+
+  <!-- ===== Module 3 — Process / Material Selection Matrix ===== -->
+  <div class="mod-grid mod-body" data-mod="3" hidden>
+    <aside class="mod-outline">
+      <div class="kicker">Module 3</div>
+      <h3>Processes &amp; Materials</h3>
+      <div class="key-q">Which process / material combination fits the application?</div>
+      <ul class="outline-list">
+        <li class="done">3.0 Module brief</li>
+        <li class="done">3.1 Process families</li>
+        <li class="done">3.2 Material classes</li>
+        <li class="active">3.3 Exercise: Selection matrix</li>
+        <li>3.4 Anisotropy explorer</li>
+        <li>3.5 Knowledge check</li>
+      </ul>
+    </aside>
+
+    <section class="mod-canvas">
+      <div class="canvas-head">
+        <h2>Exercise · Process &amp; material selection matrix</h2>
+        <p>Specify your part requirements. Cells score green / amber / red live. Watch which processes survive your spec.</p>
+      </div>
+
+      <div class="matrix-req">
+        <div class="req-field">
+          <label>Max service temp <output id="r-temp-out">120°C</output></label>
+          <input id="r-temp" type="range" min="40" max="400" value="120"/>
+        </div>
+        <div class="req-field">
+          <label>Min UTS <output id="r-uts-out">45 MPa</output></label>
+          <input id="r-uts" type="range" min="20" max="700" value="45"/>
+        </div>
+        <div class="req-field">
+          <label>Tolerance <output id="r-tol-out">±0.20 mm</output></label>
+          <input id="r-tol" type="range" min="5" max="100" value="20"/>
+        </div>
+        <div class="req-field">
+          <label>Surface finish <output id="r-sur-out">Functional</output></label>
+          <input id="r-sur" type="range" min="0" max="3" value="1" step="1"/>
+        </div>
+        <div class="req-field">
+          <label>Annual volume <output id="r-vol-out">120 units/yr</output></label>
+          <input id="r-vol" type="range" min="1" max="100000" value="120" step="1"/>
+        </div>
+        <div class="req-field">
+          <label>Qualification <output id="r-qual-out">Production · Tier B</output></label>
+          <input id="r-qual" type="range" min="0" max="3" value="2" step="1"/>
+        </div>
+      </div>
+
+      <div class="matrix-wrap">
+        <table class="matrix" id="matrix">
+          <thead>
+            <tr>
+              <th></th>
+              <th>FDM</th><th>SLA</th><th>SLS</th><th>MJF</th>
+              <th>Metal LPBF</th><th>Binder Jet</th><th>CNC</th><th>Inj. mold</th>
+            </tr>
+          </thead>
+          <tbody id="matrix-body"></tbody>
+        </table>
+      </div>
+
+      <div class="recommended" id="recommended">
+        <div class="rec-pair">
+          <div class="kicker">Recommended pair</div>
+          <h3 id="rec-title">MJF · PA12-GB</h3>
+          <p id="rec-rationale">Best balance of strength, accuracy, and small-batch economics for your spec.</p>
+        </div>
+        <button class="btn btn-primary">Send to capstone Step 4 →</button>
+      </div>
+    </section>
+
+    <aside class="mod-right">
+      <div class="card-title">Anisotropy explorer</div>
+      <div class="aniso">
+        <svg viewBox="0 0 200 160" id="aniso-svg">
+          <defs>
+            <pattern id="alay" patternUnits="userSpaceOnUse" width="4" height="4">
+              <line x1="0" y1="0" x2="4" y2="0" stroke="#3a8dff" stroke-width="0.4"/>
+            </pattern>
+          </defs>
+          <rect x="60" y="40" width="80" height="80" fill="url(#alay)" stroke="#3a8dff" stroke-width="1.2" id="aniso-coupon"/>
+          <g id="aniso-arrow" stroke="#f7b500" stroke-width="2" fill="none">
+            <line x1="100" y1="10" x2="100" y2="30"/>
+            <polyline points="95,25 100,30 105,25"/>
+            <line x1="100" y1="130" x2="100" y2="150"/>
+            <polyline points="95,135 100,130 105,135"/>
+          </g>
+        </svg>
+        <label>Build orientation <output id="aniso-ang-out">0°</output></label>
+        <input type="range" min="0" max="90" value="0" id="aniso-ang"/>
+        <div class="aniso-stats">
+          <div><span>UTS retained</span><strong id="aniso-uts">100%</strong></div>
+          <div><span>Risk level</span><strong id="aniso-risk">Low</strong></div>
+        </div>
+      </div>
+    </aside>
+  </div>
+
+  <!-- ===== Module 4 — Orientation Studio ===== -->
+  <div class="mod-grid mod-body" data-mod="4" hidden>
+    <aside class="mod-outline">
+      <div class="kicker">Module 4</div>
+      <h3>Designing for AM Performance</h3>
+      <div class="key-q">How do we design so the material and process can perform?</div>
+      <ul class="outline-list">
+        <li class="done">4.0 Module brief</li>
+        <li class="done">4.1 Load paths</li>
+        <li class="active">4.2 Orientation studio</li>
+        <li>4.3 Wall &amp; lattice strategy</li>
+        <li>4.4 Stress concentration</li>
+        <li>4.5 Redesign sprint</li>
+      </ul>
+    </aside>
+
+    <section class="mod-canvas">
+      <div class="canvas-head">
+        <h2>Exercise · Orientation studio</h2>
+        <p>Rotate the bracket in the build chamber. Four readouts update live. Find the orientation that wins on three of them — there is almost never an orientation that wins on all four.</p>
+      </div>
+
+      <div class="ostudio">
+        <div class="chamber">
+          <svg viewBox="0 0 360 280" id="chamber-svg">
+            <g id="chamber-bg">
+              <rect x="20" y="20" width="320" height="240" fill="none" stroke="#2a323d" stroke-dasharray="4 3"/>
+              <line x1="20" y1="240" x2="340" y2="240" stroke="#2a323d"/>
+              <text x="22" y="252" font-family="ui-monospace, monospace" font-size="9" fill="#6b7787">BUILD PLATE</text>
+            </g>
+            <g id="chamber-layers"></g>
+            <g id="chamber-part" transform="translate(180 160) rotate(0)">
+              <path d="M-70 -22 L70 -22 L90 22 L-90 22 Z" fill="#1a2129" stroke="#5aa1ff" stroke-width="1.5"/>
+              <circle cx="-50" cy="0" r="8" fill="#101418" stroke="#f7b500" stroke-width="1.2"/>
+              <circle cx="50"  cy="0" r="8" fill="#101418" stroke="#f7b500" stroke-width="1.2"/>
+              <path d="M-30 22 L-30 50 L30 50 L30 22" fill="none" stroke="#5aa1ff" stroke-width="1.5"/>
+            </g>
+            <g id="chamber-supports"></g>
+            <g id="chamber-load" stroke="#e5484d" stroke-width="2" fill="none">
+              <line x1="180" y1="80" x2="180" y2="120"/>
+              <polyline points="172,112 180,120 188,112"/>
+              <text x="186" y="100" font-family="ui-monospace, monospace" font-size="10" fill="#e5484d">LOAD</text>
+            </g>
+          </svg>
+        </div>
+
+        <div class="ostudio-ctrl">
+          <div class="osctrl">
+            <label>Build orientation <output id="o-ang-out">0°</output></label>
+            <input type="range" min="0" max="90" value="0" id="o-ang"/>
+          </div>
+          <div class="osctrl">
+            <label>Fillet radius <output id="o-fil-out">0.5 mm</output></label>
+            <input type="range" min="1" max="80" value="5" id="o-fil"/>
+          </div>
+          <div class="osctrl">
+            <label>Wall strategy <output id="o-wall-out">3 perimeters · 30% gyroid</output></label>
+            <input type="range" min="0" max="4" value="2" step="1" id="o-wall"/>
+          </div>
+        </div>
+
+        <div class="readouts">
+          <div class="ro"><div class="ro-lbl">Anisotropy risk</div><div class="ro-val" id="ro-aniso">Low</div><div class="ro-bar"><span id="ro-aniso-bar"></span></div></div>
+          <div class="ro"><div class="ro-lbl">Support volume</div><div class="ro-val" id="ro-sup">4.1 cm³</div><div class="ro-bar"><span id="ro-sup-bar"></span></div></div>
+          <div class="ro"><div class="ro-lbl">Critical-face surface</div><div class="ro-val" id="ro-sur">Good</div><div class="ro-bar"><span id="ro-sur-bar"></span></div></div>
+          <div class="ro"><div class="ro-lbl">Build time</div><div class="ro-val" id="ro-time">6.2 h</div><div class="ro-bar"><span id="ro-time-bar"></span></div></div>
+        </div>
+
+        <div class="checklist-strip">
+          <div class="card-title">DfAM design checklist (auto-evaluated)</div>
+          <ul class="checks" id="checks"></ul>
+        </div>
+      </div>
+    </section>
+
+    <aside class="mod-right">
+      <div class="card-title">Stress concentration</div>
+      <svg viewBox="0 0 200 160" id="sc-svg" class="sc-svg">
+        <path d="M30 130 L30 60 L170 60 L170 130 Z" fill="none" stroke="#5aa1ff" stroke-width="1.5"/>
+        <path id="sc-fillet" d="M40 60 Q30 60 30 70" fill="none" stroke="#f7b500" stroke-width="2"/>
+        <circle id="sc-hot" cx="36" cy="66" r="8" fill="rgba(229,72,77,.5)"/>
+      </svg>
+      <div class="sc-readout">
+        <div><span>Kt (stress concentration factor)</span><strong id="sc-kt">3.20</strong></div>
+        <div><span>Predicted fatigue life</span><strong id="sc-life">12k cycles</strong></div>
+      </div>
+      <p class="hint">Tip: doubling the fillet radius typically cuts Kt by ~30%. Try it.</p>
+    </aside>
+  </div>
+
+  <!-- ===== Module 5 — Factory Opportunity Map ===== -->
+  <div class="mod-grid mod-body" data-mod="5" hidden>
+    <aside class="mod-outline">
+      <div class="kicker">Module 5</div>
+      <h3>Industrial Use Cases</h3>
+      <div class="key-q">How does DfAM apply inside a manufacturing company?</div>
+      <ul class="outline-list">
+        <li class="done">5.0 Module brief</li>
+        <li class="done">5.1 Application classes</li>
+        <li class="active">5.2 Factory opportunity map</li>
+        <li>5.3 Bridge production tree</li>
+        <li>5.4 Knowledge check</li>
+      </ul>
+    </aside>
+
+    <section class="mod-canvas">
+      <div class="canvas-head">
+        <h2>Exercise · Factory AM opportunity map</h2>
+        <p>Drop candidate parts onto the facility where they belong. Zones color by aggregate potential value. Aim for 6+ placements.</p>
+      </div>
+
+      <div class="factory">
+        <div class="factory-pins">
+          <div class="card-title">Candidate parts</div>
+          <div class="pin-tray" id="pin-tray"></div>
+        </div>
+        <div class="factory-floor" id="floor">
+          <div class="zone" data-zone="fixture">
+            <div class="z-label">Cell B7 · Welding</div>
+            <div class="z-val" data-val>$0</div>
+          </div>
+          <div class="zone" data-zone="eoat">
+            <div class="z-label">Assembly · EOAT</div>
+            <div class="z-val" data-val>$0</div>
+          </div>
+          <div class="zone" data-zone="mro">
+            <div class="z-label">Maintenance crib</div>
+            <div class="z-val" data-val>$0</div>
+          </div>
+          <div class="zone" data-zone="jig">
+            <div class="z-label">Quality &amp; jigs</div>
+            <div class="z-val" data-val>$0</div>
+          </div>
+          <div class="zone" data-zone="ergo">
+            <div class="z-label">Ergonomics &amp; safety</div>
+            <div class="z-val" data-val>$0</div>
+          </div>
+          <div class="zone" data-zone="bridge">
+            <div class="z-label">Bridge production</div>
+            <div class="z-val" data-val>$0</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="factory-summary">
+        <div><span class="card-title">Placed</span><strong id="fp-count">0 / 8</strong></div>
+        <div><span class="card-title">Projected annual value</span><strong id="fp-total">$0</strong></div>
+        <div><span class="card-title">First deployment pick</span><strong id="fp-pick">—</strong></div>
+        <button class="btn btn-primary">Send map to capstone →</button>
+      </div>
+    </section>
+
+    <aside class="mod-right">
+      <div class="card-title">Application class profiles</div>
+      <ul class="ac-list">
+        <li><strong>Jigs &amp; fixtures</strong><span>FDM / MJF · weekly turn</span></li>
+        <li><strong>EOAT &amp; grippers</strong><span>SLS · weight-driven</span></li>
+        <li><strong>Maintenance / MRO</strong><span>FDM · spare parts</span></li>
+        <li><strong>Inspection jigs</strong><span>SLA · accuracy</span></li>
+        <li><strong>Ergonomic tools</strong><span>SLS · custom fit</span></li>
+        <li><strong>Bridge production</strong><span>MJF · pre-tooling</span></li>
+      </ul>
+    </aside>
+  </div>
+
+  <!-- ===== Module 6 — Validation Plan Builder ===== -->
+  <div class="mod-grid mod-body" data-mod="6" hidden>
+    <aside class="mod-outline">
+      <div class="kicker">Module 6</div>
+      <h3>Testing, Validation &amp; Risk</h3>
+      <div class="key-q">What needs to be proven before this part can be used?</div>
+      <ul class="outline-list">
+        <li class="done">6.0 Module brief</li>
+        <li class="done">6.1 Criticality classifier</li>
+        <li class="done">6.2 Failure mode deck</li>
+        <li class="active">6.3 Validation plan builder</li>
+        <li>6.4 Knowledge check</li>
+      </ul>
+    </aside>
+
+    <section class="mod-canvas">
+      <div class="canvas-head">
+        <h2>Exercise · Validation plan builder</h2>
+        <p>Tier-A part: <strong>Coolant manifold · Plant 2</strong>. Drag each failure mode card and assign it inspection, test, and acceptance criteria. The coverage gauge updates live.</p>
+      </div>
+
+      <div class="vbuild">
+        <div class="vmode-deck" id="vmode-deck">
+          <div class="card-title">Failure modes</div>
+          <div class="vmode-list" id="vmode-list"></div>
+        </div>
+
+        <div class="vcols">
+          <div class="vcol" data-col="inspect">
+            <div class="vcol-head">Inspection</div>
+            <div class="vcol-body" data-drop></div>
+          </div>
+          <div class="vcol" data-col="test">
+            <div class="vcol-head">Test</div>
+            <div class="vcol-body" data-drop></div>
+          </div>
+          <div class="vcol" data-col="accept">
+            <div class="vcol-head">Acceptance</div>
+            <div class="vcol-body" data-drop></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="vsummary">
+        <div class="coverage">
+          <div class="card-title">Coverage</div>
+          <div class="cov-bar"><span id="cov-fill" style="width:0%"></span></div>
+          <div class="cov-num" id="cov-num">0%</div>
+        </div>
+        <div class="missing" id="missing"><span class="kicker">Missing</span><div id="missing-list">Drag failure modes into columns to begin.</div></div>
+        <button class="btn btn-primary">Export plan · capstone Step 8 →</button>
+      </div>
+    </section>
+
+    <aside class="mod-right">
+      <div class="card-title">Criticality</div>
+      <div class="crit-badge">Tier A · Critical to safety</div>
+      <ul class="crit-rules">
+        <li>All Sev 4–5 modes must have inspection + test</li>
+        <li>Documentation: full PPAP package</li>
+        <li>Acceptance must be quantitative (no "visual OK")</li>
+        <li>Sign-off: design + QE + production</li>
+      </ul>
+    </aside>
+  </div>
+
+  <!-- ===== Module 7 — Business Case Calculator ===== -->
+  <div class="mod-grid mod-body" data-mod="7" hidden>
+    <aside class="mod-outline">
+      <div class="kicker">Module 7</div>
+      <h3>Costing &amp; Business Case</h3>
+      <div class="key-q">Why would the company approve this?</div>
+      <ul class="outline-list">
+        <li class="done">7.0 Module brief</li>
+        <li class="done">7.1 Cost-per-part</li>
+        <li class="active">7.2 Business case builder</li>
+        <li>7.3 Executive one-slide</li>
+        <li>7.4 Knowledge check</li>
+      </ul>
+    </aside>
+
+    <section class="mod-canvas">
+      <div class="canvas-head">
+        <h2>Exercise · AM business case calculator</h2>
+        <p>Quantify every lever. Cost-per-part is rarely the headline — find the value the AM redesign actually unlocks.</p>
+      </div>
+
+      <div class="bc-grid">
+        <div class="bc-inputs">
+          <div class="card-title">Current state</div>
+          <div class="bc-row"><label>Cost per part</label><input type="number" id="bc-cur-cost" value="3800"/><span>$</span></div>
+          <div class="bc-row"><label>Lead time</label><input type="number" id="bc-cur-lt" value="11"/><span>days</span></div>
+          <div class="bc-row"><label>Annual volume</label><input type="number" id="bc-vol" value="40"/><span>units/yr</span></div>
+
+          <div class="card-title" style="margin-top:18px">AM redesign</div>
+          <div class="bc-row"><label>AM cost per part</label><input type="number" id="bc-am-cost" value="980"/><span>$</span></div>
+          <div class="bc-row"><label>AM lead time</label><input type="number" id="bc-am-lt" value="28"/><span>hours</span></div>
+
+          <div class="card-title" style="margin-top:18px">Value levers</div>
+          <div class="bc-row"><label>Downtime hours avoided</label><input type="number" id="bc-dt-hrs" value="6"/><span>hrs/yr</span></div>
+          <div class="bc-row"><label>Cost per downtime hour</label><input type="number" id="bc-dt-cost" value="2800"/><span>$</span></div>
+          <div class="bc-row"><label>Tooling vendor avoided</label><input type="number" id="bc-tool" value="42000"/><span>$/yr</span></div>
+          <div class="bc-row"><label>Inventory carry reduction</label><input type="number" id="bc-inv" value="14000"/><span>$/yr</span></div>
+          <div class="bc-row"><label>Implementation cost (one-time)</label><input type="number" id="bc-impl" value="58000"/><span>$</span></div>
+        </div>
+
+        <div class="bc-output">
+          <div class="bc-head">
+            <div class="card-title">Total annual value</div>
+            <div class="bc-big" id="bc-total">$0</div>
+            <div class="bc-sub">ROI period · <strong id="bc-roi">0 months</strong></div>
+          </div>
+
+          <ul class="bc-bars" id="bc-bars"></ul>
+
+          <div class="exec-slide">
+            <div class="card-title">Executive one-slide preview</div>
+            <div class="es-pdf">
+              <div class="es-h">Welding fixture · Cell B7 — AM redesign</div>
+              <div class="es-tbl">
+                <div><span>Per-unit savings</span><strong id="es-unit">$0</strong></div>
+                <div><span>Annual cost savings</span><strong id="es-cost">$0</strong></div>
+                <div><span>Downtime value</span><strong id="es-dt">$0</strong></div>
+                <div><span>Tooling avoided</span><strong id="es-tool">$0</strong></div>
+                <div><span>Inventory impact</span><strong id="es-inv">$0</strong></div>
+              </div>
+              <div class="es-foot">Recommendation: pilot Q3 · sponsor VP Ops · gate 30-day validation</div>
+            </div>
+            <button class="btn btn-primary full">Export to capstone Step 9 →</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <aside class="mod-right">
+      <div class="card-title">What executives ask</div>
+      <ul class="exec-qs">
+        <li>"What's the payback?"</li>
+        <li>"How is this different from cheaper machining?"</li>
+        <li>"What's the risk if it doesn't work?"</li>
+        <li>"Why now?"</li>
+        <li>"What's the next $1M of value after this?"</li>
+      </ul>
+      <p class="hint">Tip: the strongest cases lead with operational value (downtime, lead time), not per-unit cost.</p>
     </aside>
   </div>
 </section>
