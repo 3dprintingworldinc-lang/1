@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  PLACEHOLDER — replace with the real Delta-X logo file.
+  This file intentionally renders only the brand-colored words "DELTA-X"
+  as a typographic stand-in until the actual logo asset is committed.
+  See ./README.md for swap instructions.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 44" role="img" aria-label="Delta-X (placeholder)">
+  <text x="0" y="34" font-family="Inter, 'Helvetica Neue', Arial, sans-serif"
+        font-weight="900" font-size="32" letter-spacing="-1" fill="#C8102E">DELTA</text>
+  <text x="120" y="34" font-family="Inter, 'Helvetica Neue', Arial, sans-serif"
+        font-weight="900" font-size="32" letter-spacing="-1" fill="#1E3FA0">-X</text>
+</svg>
