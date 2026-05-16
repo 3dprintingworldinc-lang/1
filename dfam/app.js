@@ -235,17 +235,17 @@ function updateRadar() {
 
   let svgInner = '';
   // rings
-  [0.33, 0.66, 1].forEach(s => { svgInner += ring(radius * s, '#2a323d'); });
+  [0.33, 0.66, 1].forEach(s => { svgInner += ring(radius * s, '#DEE4ED'); });
   // axes
   for (let i = 0; i < N; i++) {
     const a = -Math.PI / 2 + (i / N) * Math.PI * 2;
     const x = center.x + Math.cos(a) * radius;
     const y = center.y + Math.sin(a) * radius;
-    svgInner += `<line x1="${center.x}" y1="${center.y}" x2="${x}" y2="${y}" stroke="#232a34" stroke-width="1"/>`;
+    svgInner += `<line x1="${center.x}" y1="${center.y}" x2="${x}" y2="${y}" stroke="#E8ECF2" stroke-width="1"/>`;
     const lx = center.x + Math.cos(a) * (radius + 16);
     const ly = center.y + Math.sin(a) * (radius + 16);
     svgInner += `<text x="${lx}" y="${ly}" font-family="ui-monospace, monospace" font-size="9"
-      fill="#6b7787" text-anchor="middle" dominant-baseline="middle">${axes[i]}</text>`;
+      fill="#7E8A9C" text-anchor="middle" dominant-baseline="middle">${axes[i]}</text>`;
   }
   // data polygon
   let dpts = '';
@@ -256,7 +256,7 @@ function updateRadar() {
     const y = center.y + Math.sin(a) * r;
     dpts += `${x},${y} `;
   }
-  svgInner += `<polygon points="${dpts.trim()}" fill="rgba(58,141,255,.22)" stroke="#3a8dff" stroke-width="1.8"/>`;
+  svgInner += `<polygon points="${dpts.trim()}" fill="rgba(11, 42, 74, 0.18)" stroke="#1E5AA8" stroke-width="1.8"/>`;
 
   svg.innerHTML = svgInner;
 }
@@ -279,7 +279,7 @@ function updateTop3() {
   list.sort((a, b) => b.score - a.score);
   const top = list.slice(0, 3);
   if (top.length === 0) {
-    el.innerHTML = `<li style="color:#6b7787;justify-content:center">Drag candidates into bins to populate</li>`;
+    el.innerHTML = `<li style="color:#7E8A9C;justify-content:center">Drag candidates into bins to populate</li>`;
     return;
   }
   el.innerHTML = top.map((x, i) => `
@@ -373,28 +373,28 @@ modTabs.forEach(t => t.addEventListener('click', () => {
   function drawPart(mode) {
     if (mode === 'bad') {
       partG.innerHTML = `
-        <rect x="60" y="100" width="240" height="60" fill="none" stroke="#e5484d" stroke-width="1.5"/>
+        <rect x="60" y="100" width="240" height="60" fill="none" stroke="#B23035" stroke-width="1.5"/>
         <rect x="60" y="100" width="240" height="60" fill="url(#layers)"/>
-        <line x1="100" y1="100" x2="100" y2="160" stroke="#e5484d" stroke-dasharray="2 3"/>
-        <line x1="160" y1="100" x2="160" y2="160" stroke="#e5484d" stroke-dasharray="2 3"/>
-        <line x1="220" y1="100" x2="220" y2="160" stroke="#e5484d" stroke-dasharray="2 3"/>
-        <path d="M130 100 q4 30 -4 60" stroke="#e5484d" stroke-width="2.5" fill="none"/>
-        <text x="135" y="92" font-family="ui-monospace, monospace" font-size="10" fill="#e5484d">CRACK</text>`;
+        <line x1="100" y1="100" x2="100" y2="160" stroke="#B23035" stroke-dasharray="2 3"/>
+        <line x1="160" y1="100" x2="160" y2="160" stroke="#B23035" stroke-dasharray="2 3"/>
+        <line x1="220" y1="100" x2="220" y2="160" stroke="#B23035" stroke-dasharray="2 3"/>
+        <path d="M130 100 q4 30 -4 60" stroke="#B23035" stroke-width="2.5" fill="none"/>
+        <text x="135" y="92" font-family="ui-monospace, monospace" font-size="10" fill="#B23035">CRACK</text>`;
     } else if (mode === 'mid') {
       partG.innerHTML = `
         <g transform="translate(180 130) rotate(-22)">
-          <rect x="-120" y="-30" width="240" height="60" fill="none" stroke="#f7b500" stroke-width="1.5"/>
+          <rect x="-120" y="-30" width="240" height="60" fill="none" stroke="#B07300" stroke-width="1.5"/>
           <rect x="-120" y="-30" width="240" height="60" fill="url(#layers)"/>
-          <path d="M-120 -30 q10 8 0 16" stroke="#f7b500" stroke-width="1" fill="none"/>
+          <path d="M-120 -30 q10 8 0 16" stroke="#B07300" stroke-width="1" fill="none"/>
         </g>`;
     } else {
       partG.innerHTML = `
         <g transform="translate(180 130)">
-          <path d="M-130 30 L-110 -30 L110 -30 L130 30 Z" fill="none" stroke="#3dd68c" stroke-width="1.5"/>
+          <path d="M-130 30 L-110 -30 L110 -30 L130 30 Z" fill="none" stroke="#167C4A" stroke-width="1.5"/>
           <path d="M-130 30 L-110 -30 L110 -30 L130 30 Z" fill="url(#layers)"/>
-          <line x1="-60" y1="-30" x2="-60" y2="30" stroke="#3dd68c" stroke-width="0.8" stroke-dasharray="2 3"/>
-          <line x1="60"  y1="-30" x2="60"  y2="30" stroke="#3dd68c" stroke-width="0.8" stroke-dasharray="2 3"/>
-          <line x1="0"   y1="-30" x2="0"   y2="30" stroke="#3a8dff" stroke-width="1.5"/>
+          <line x1="-60" y1="-30" x2="-60" y2="30" stroke="#167C4A" stroke-width="0.8" stroke-dasharray="2 3"/>
+          <line x1="60"  y1="-30" x2="60"  y2="30" stroke="#167C4A" stroke-width="0.8" stroke-dasharray="2 3"/>
+          <line x1="0"   y1="-30" x2="0"   y2="30" stroke="#1E5AA8" stroke-width="1.5"/>
         </g>`;
     }
   }
@@ -609,7 +609,7 @@ modTabs.forEach(t => t.addEventListener('click', () => {
     if (sup > 1.5) {
       for (let i = 0; i < Math.min(20, sup * 2); i++) {
         const x = 110 + i * 8;
-        supSvg += `<line x1="${x}" y1="240" x2="${x}" y2="${240 - 6 - sup * 1.5}" stroke="#e5484d" stroke-width="0.7"/>`;
+        supSvg += `<line x1="${x}" y1="240" x2="${x}" y2="${240 - 6 - sup * 1.5}" stroke="#B23035" stroke-width="0.7"/>`;
       }
     }
     supports.innerHTML = supSvg;
@@ -618,7 +618,7 @@ modTabs.forEach(t => t.addEventListener('click', () => {
     let layerSvg = '';
     const lh = 4;
     for (let y = 60; y < 240; y += lh) {
-      layerSvg += `<line x1="40" y1="${y}" x2="320" y2="${y}" stroke="#3a8dff" stroke-width="0.15" stroke-opacity="0.35"/>`;
+      layerSvg += `<line x1="40" y1="${y}" x2="320" y2="${y}" stroke="#1E5AA8" stroke-width="0.15" stroke-opacity="0.35"/>`;
     }
     layers.innerHTML = layerSvg;
 
@@ -646,7 +646,7 @@ modTabs.forEach(t => t.addEventListener('click', () => {
     // hot spot intensity inversely correlated
     const hot = document.getElementById('sc-hot');
     hot.setAttribute('r', Math.max(3, 12 - filMm * 1.6));
-    hot.setAttribute('fill', `rgba(229,72,77,${0.7 - filMm * 0.08})`);
+    hot.setAttribute('fill', `rgba(178, 48, 53, ${0.6 - filMm * 0.06})`);
   }
   function clamp(x){ return Math.max(0, Math.min(1, x)); }
   function setReadout(valId, barId, val01, label, invert) {
