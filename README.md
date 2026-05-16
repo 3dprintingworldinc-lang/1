@@ -1,3 +1,12 @@
+# This repo
+
+This repository hosts two unrelated demos on different branches:
+
+- **`main`** — *Work Hours & Invoicing* (see below)
+- **`claude/dfam-course-mockup-Uiteq`** — *Production-Ready DfAM* interactive course platform mockup, at `/dfam/`. See `dfam-course-mockup.md` for the spec, and visit `/dfam/` once GitHub Pages is enabled on this branch.
+
+---
+
 # Work Hours & Invoicing
 
 A simple Progressive Web App for logging work hours, tracking paid/unpaid status, and generating invoices. Installs to your iPhone home screen like a native app — no App Store, no Xcode, no developer account required.
