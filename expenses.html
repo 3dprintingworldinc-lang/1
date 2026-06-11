@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
+  <meta name="theme-color" content="#0a84ff" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Expenses" />
+  <link rel="apple-touch-icon" href="icon-180.png" />
+  <link rel="stylesheet" href="expenses.css" />
+  <title>RBC Expense Tracker</title>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-row">
+      <h1>Expenses</h1>
+      <a href="index.html" class="nav-link">Hours &rarr;</a>
+    </div>
+    <div class="summary" id="summaryBar">
+      <div><span class="label">This month</span><span id="sumMonth" class="amount">$0.00</span></div>
+      <div><span class="label">This year</span><span id="sumYear" class="amount muted">$0.00</span></div>
+      <div><span class="label">Transactions</span><span id="sumCount" class="amount muted">0</span></div>
+    </div>
+  </header>
+
+  <nav class="tab-bar">
+    <button class="tab active" data-tab="dashboard">Dashboard</button>
+    <button class="tab" data-tab="transactions">Transactions</button>
+    <button class="tab" data-tab="add">+ Add</button>
+    <button class="tab" data-tab="import">Import RBC</button>
+  </nav>
+
+  <main>
+    <!-- DASHBOARD TAB -->
+    <section id="tab-dashboard" class="tab-content">
+      <div class="card">
+        <div class="card-header">
+          <h2>Spending by Category</h2>
+          <select id="periodPicker" class="pill-select">
+            <option value="month">This month</option>
+            <option value="last_month">Last month</option>
+            <option value="3months">Last 3 months</option>
+            <option value="year">This year</option>
+            <option value="all">All time</option>
+          </select>
+        </div>
+        <canvas id="categoryChart" height="240"></canvas>
+        <div id="categoryList" class="category-list"></div>
+      </div>
+
+      <div class="card">
+        <h2>Monthly Trend</h2>
+        <canvas id="trendChart" height="180"></canvas>
+      </div>
+
+      <div class="card">
+        <h2>Top Merchants</h2>
+        <div id="topMerchants" class="merchant-list"></div>
+      </div>
+    </section>
+
+    <!-- TRANSACTIONS TAB -->
+    <section id="tab-transactions" class="tab-content hidden">
+      <div class="card">
+        <div class="search-row">
+          <input type="search" id="searchInput" placeholder="Search transactions…" />
+          <select id="catFilter" class="pill-select">
+            <option value="">All categories</option>
+          </select>
+        </div>
+        <div class="entries-header">
+          <span id="txCount" class="muted small">0 transactions</span>
+          <div class="filters">
+            <button class="filter active" data-txfilter="expense">Expenses</button>
+            <button class="filter" data-txfilter="income">Income</button>
+            <button class="filter" data-txfilter="all">All</button>
+          </div>
+        </div>
+        <ul id="txList" class="entries"></ul>
+        <p id="txEmpty" class="empty hidden">No transactions found.</p>
+      </div>
+    </section>
+
+    <!-- ADD TAB -->
+    <section id="tab-add" class="tab-content hidden">
+      <div class="card">
+        <h2 id="addFormTitle">Add transaction</h2>
+        <form id="addForm" autocomplete="off">
+          <input type="hidden" id="editId" />
+
+          <label>
+            Date
+            <input type="date" id="txDate" required />
+          </label>
+
+          <label>
+            Description
+            <input type="text" id="txDesc" maxlength="200" placeholder="e.g. Grocery store" required />
+          </label>
+
+          <div class="row">
+            <label>
+              Amount ($)
+              <input type="number" id="txAmount" inputmode="decimal" step="0.01" min="0" placeholder="0.00" required />
+            </label>
+            <label>
+              Type
+              <select id="txType" class="full-select">
+                <option value="expense">Expense</option>
+                <option value="income">Income</option>
+              </select>
+            </label>
+          </div>
+
+          <label>
+            Category
+            <select id="txCat" class="full-select"></select>
+          </label>
+
+          <label>
+            Notes (optional)
+            <input type="text" id="txNotes" maxlength="300" placeholder="Optional note" />
+          </label>
+
+          <div class="actions">
+            <button type="submit" id="addSaveBtn" class="primary">Save</button>
+            <button type="button" id="addCancelBtn" class="ghost hidden">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- IMPORT TAB -->
+    <section id="tab-import" class="tab-content hidden">
+      <div class="card">
+        <h2>Import from RBC</h2>
+        <p class="muted small">Download your transaction history from RBC Online Banking as a CSV file, then import it here. Duplicates are automatically skipped.</p>
+        <ol class="import-steps">
+          <li>Log in to <strong>RBC Online Banking</strong></li>
+          <li>Go to your account &rarr; <strong>Download Transactions</strong></li>
+          <li>Choose <strong>CSV</strong> format and download</li>
+          <li>Tap the button below to import the file</li>
+        </ol>
+
+        <div class="drop-zone" id="dropZone">
+          <div class="drop-icon">&#128196;</div>
+          <p>Tap to select your RBC CSV file</p>
+          <p class="muted small">or drag & drop here</p>
+          <input type="file" id="csvFile" accept=".csv,text/csv" />
+        </div>
+
+        <div id="importPreview" class="hidden">
+          <div class="import-summary" id="importSummary"></div>
+          <div class="actions">
+            <button type="button" id="confirmImportBtn" class="primary">Import transactions</button>
+            <button type="button" id="cancelImportBtn" class="ghost">Cancel</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Manage data</h2>
+        <div class="actions">
+          <button type="button" id="exportBtn" class="ghost">Export CSV</button>
+          <button type="button" id="clearAllBtn" class="ghost danger">Clear all data</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Edit category modal -->
+  <div id="catModal" class="modal hidden" role="dialog" aria-modal="true">
+    <div class="modal-content small-modal">
+      <h3>Edit category</h3>
+      <p id="catModalDesc" class="muted small"></p>
+      <select id="catModalSelect" class="full-select" style="margin-bottom:16px"></select>
+      <div class="actions">
+        <button type="button" id="catModalSave" class="primary">Save</button>
+        <button type="button" id="catModalCancel" class="ghost">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+  <script src="expenses.js"></script>
+</body>
+</html>
