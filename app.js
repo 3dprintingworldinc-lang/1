@@ -1,416 +1,308 @@
-(function () {
-  'use strict';
+/* 3D Printing World — storefront logic
+ * Pricing model (see BUSINESS_PLAN.md §3): machine time is the only thing
+ * customers pay for. Materials are structurally $0 and shown as such.
+ */
 
-  const STORAGE_KEY = 'workHoursEntries.v1';
-  const SETTINGS_KEY = 'workHoursSettings.v1';
+const ORDER_EMAIL = '3dprintingworldinc@gmail.com';
 
-  const $ = (id) => document.getElementById(id);
+const PRICING = {
+  ratePerHour: 8,
+  minOrder: 15,
+  quality: { draft: 0.85, standard: 1.0, fine: 1.35 },
+  rush: 1.75,
+  qtyBreaks: [
+    { min: 20, factor: 0.8, label: '−20%' },
+    { min: 5, factor: 0.9, label: '−10%' },
+  ],
+  shippingFlat: 6,
+  freeShippingOver: 60,
+};
 
-  const form = $('entryForm');
-  const entriesList = $('entries');
-  const emptyState = $('emptyState');
-  const outstandingTotal = $('outstandingTotal');
-  const paidTotal = $('paidTotal');
-  const formTitle = $('formTitle');
-  const saveBtn = $('saveBtn');
-  const cancelBtn = $('cancelBtn');
-  const invoiceModal = $('invoiceModal');
-  const invoiceContent = $('invoiceContent');
+/* ============ Catalog data ============ */
 
-  let entries = loadEntries();
-  let settings = loadSettings();
-  let activeFilter = 'all';
+const CATALOG = [
+  {
+    name: 'XL Geometric Planter',
+    price: 49,
+    tag: 'prints in ~22 h',
+    icon: '🪴',
+    desc: 'A 30 cm faceted planter with drainage insert. Heavy, solid, and satisfying — the kind of piece other shops surcharge by the kilogram.',
+  },
+  {
+    name: 'Giant Articulated Dragon (60 cm)',
+    price: 59,
+    tag: 'prints in ~14 h',
+    icon: '🐉',
+    desc: 'Fully articulated, prints assembled, flexes like a living thing. Pick any color when you order.',
+  },
+  {
+    name: 'Cosplay Helmet — Fitted',
+    price: 149,
+    tag: 'prints in ~35 h',
+    icon: '🪖',
+    desc: 'Printed to your head measurements, sanded seams, ready for paint. Send a reference image of any design.',
+  },
+  {
+    name: 'Modular Desk Organizer Set',
+    price: 29,
+    tag: 'prints in ~8 h',
+    icon: '🗂️',
+    desc: 'Six interlocking trays, pen silo, phone dock, and headphone hook. Reconfigure it as your desk evolves.',
+  },
+  {
+    name: 'Board Game Insert Set',
+    price: 44,
+    tag: 'prints in ~12 h',
+    icon: '🎲',
+    desc: 'Custom-fit organizer trays for your game box — tell us the game, we ship the perfect insert.',
+  },
+  {
+    name: 'Wall-Mount Tool Rack System',
+    price: 34,
+    tag: 'prints in ~10 h',
+    icon: '🔧',
+    desc: 'French-cleat modular rack for pliers, drivers, and drills. Add modules any time — the cleat spec never changes.',
+  },
+  {
+    name: 'Lithophane Night Light',
+    price: 39,
+    tag: 'prints in ~6 h',
+    icon: '💡',
+    desc: 'Your photo, printed in translucent relief with an LED base. Invisible by day, glowing portrait by night.',
+  },
+  {
+    name: 'Replacement Part Service',
+    price: 25,
+    priceLabel: 'from $25',
+    tag: 'usually ~2 h + design',
+    icon: '⚙️',
+    desc: 'Broken bracket, knob, clip, or gear from any appliance. Photo + measurements in, working part out.',
+  },
+];
 
-  init();
+const DIGITAL = [
+  {
+    name: 'XL Geometric Planter — STL',
+    price: 12,
+    tag: 'instant email delivery',
+    icon: '🪴',
+    desc: 'The full planter kit: 3 sizes, drainage inserts, tested print profiles for 0.4/0.6 mm nozzles.',
+  },
+  {
+    name: 'Modular Desk Organizer — STL',
+    price: 9,
+    tag: 'instant email delivery',
+    icon: '🗂️',
+    desc: 'All 9 modules plus the interlock spec so you can design your own additions.',
+  },
+  {
+    name: 'French-Cleat Tool Rack — STL',
+    price: 9,
+    tag: 'instant email delivery',
+    icon: '🔧',
+    desc: '12 tool modules and the cleat template. The workshop system that grows forever.',
+  },
+  {
+    name: 'Articulated Dragon — STL',
+    price: 14,
+    tag: 'instant email delivery',
+    icon: '🐉',
+    desc: 'Prints fully assembled, no supports. Includes 40/60/80 cm scale-tested variants.',
+  },
+  {
+    name: 'Board Game Insert Toolkit — STL',
+    price: 19,
+    tag: 'instant email delivery',
+    icon: '🎲',
+    desc: 'Parametric tray system: set your box dimensions, generate perfect-fit inserts for any game.',
+  },
+  {
+    name: 'Lithophane Lamp Base — STL',
+    price: 7,
+    tag: 'instant email delivery',
+    icon: '💡',
+    desc: 'The LED lamp base and frame. Pair with any lithophane generator for endless custom gifts.',
+  },
+];
 
-  function init() {
-    $('date').valueAsDate = new Date();
-    $('invoiceFrom').value = settings.invoiceFrom || '';
-    $('invoiceTo').value = settings.invoiceTo || '';
+/* ============ Helpers ============ */
 
-    form.addEventListener('submit', onSubmit);
-    cancelBtn.addEventListener('click', resetForm);
+const $ = (id) => document.getElementById(id);
+const money = (n) => '$' + n.toFixed(2);
 
-    document.querySelectorAll('.filter').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        document.querySelectorAll('.filter').forEach((b) => b.classList.remove('active'));
-        btn.classList.add('active');
-        activeFilter = btn.dataset.filter;
-        renderEntries();
-      });
+function mailtoLink(subject, body) {
+  return (
+    'mailto:' + ORDER_EMAIL +
+    '?subject=' + encodeURIComponent(subject) +
+    '&body=' + encodeURIComponent(body)
+  );
+}
+
+/* ============ Quote calculator ============ */
+
+function computeQuote({ hours, quality, qty, rush }) {
+  const qualityFactor = PRICING.quality[quality] ?? 1;
+  const brk = PRICING.qtyBreaks.find((b) => qty >= b.min);
+  const qtyFactor = brk ? brk.factor : 1;
+
+  const machineBase = hours * PRICING.ratePerHour * qualityFactor * qty;
+  const afterDiscount = machineBase * qtyFactor;
+  const afterRush = rush ? afterDiscount * PRICING.rush : afterDiscount;
+
+  const subtotal = Math.max(PRICING.minOrder, afterRush);
+  const minApplied = afterRush < PRICING.minOrder;
+  const shipping = subtotal >= PRICING.freeShippingOver ? 0 : PRICING.shippingFlat;
+
+  return {
+    machine: machineBase,
+    discount: brk ? machineBase - afterDiscount : 0,
+    discountLabel: brk ? brk.label : null,
+    rushSurcharge: rush ? afterRush - afterDiscount : 0,
+    subtotal,
+    minApplied,
+    shipping,
+    total: subtotal + shipping,
+  };
+}
+
+function readQuoteInputs() {
+  return {
+    hours: Math.min(200, Math.max(0.5, parseFloat($('qHours').value) || 0.5)),
+    quality: $('qQuality').value,
+    qty: Math.min(500, Math.max(1, parseInt($('qQty').value, 10) || 1)),
+    rush: $('qRush').checked,
+  };
+}
+
+function renderQuote() {
+  const inputs = readQuoteInputs();
+  const q = computeQuote(inputs);
+
+  $('lineMachine').textContent = money(q.machine);
+  $('lineMaterials').textContent = money(0);
+  $('lineShipping').textContent = q.shipping === 0 ? 'FREE' : money(q.shipping);
+  $('lineTotal').textContent = money(q.total);
+
+  $('lineDiscountRow').classList.toggle('hidden', q.discount === 0);
+  if (q.discount > 0) {
+    $('lineDiscount').textContent = '−' + money(q.discount).slice(1) + ' (' + q.discountLabel + ')';
+  }
+
+  $('lineRushRow').classList.toggle('hidden', q.rushSurcharge === 0);
+  if (q.rushSurcharge > 0) {
+    $('lineRush').textContent = '+' + money(q.rushSurcharge).slice(1);
+  }
+
+  $('quoteNote').textContent = q.minApplied
+    ? 'Our order minimum of ' + money(PRICING.minOrder) + ' applies — you can add more parts at no extra cost until you pass it.'
+    : q.shipping === 0
+      ? 'Free shipping applied (orders over ' + money(PRICING.freeShippingOver) + ').'
+      : '';
+
+  const qualityName = $('qQuality').selectedOptions[0].textContent.split('—')[0].trim();
+  const body = [
+    'Hi 3D Printing World,',
+    '',
+    'I would like to order the following print job:',
+    '',
+    '  Estimated print time: ' + inputs.hours + ' h',
+    '  Quality: ' + qualityName,
+    '  Quantity: ' + inputs.qty,
+    '  Rush 48h: ' + (inputs.rush ? 'YES' : 'no'),
+    '  Quoted total: ' + money(q.total) + ' (materials: $0.00)',
+    '',
+    'My model file is attached / described below:',
+    '',
+  ].join('\n');
+  $('orderQuoteBtn').href = mailtoLink('Print order — quoted ' + money(q.total), body);
+}
+
+function initQuote() {
+  const form = $('quoteForm');
+  if (!form) return;
+
+  form.addEventListener('input', renderQuote);
+  form.addEventListener('submit', (e) => e.preventDefault());
+
+  document.querySelectorAll('.chip[data-hours]').forEach((chip) => {
+    chip.addEventListener('click', () => {
+      $('qHours').value = chip.dataset.hours;
+      document.querySelectorAll('.chip').forEach((c) => c.classList.remove('active'));
+      chip.classList.add('active');
+      renderQuote();
     });
+  });
 
-    ['startTime', 'endTime'].forEach((id) => {
-      $(id).addEventListener('change', autoFillHours);
+  renderQuote();
+}
+
+/* ============ Product grids ============ */
+
+function productCard(p, kind) {
+  const card = document.createElement('div');
+  card.className = 'product';
+
+  const subject = (kind === 'digital' ? 'STL purchase — ' : 'Order — ') + p.name;
+  const body = [
+    'Hi 3D Printing World,',
+    '',
+    (kind === 'digital'
+      ? 'I would like to buy the digital file: ' + p.name + ' (' + money(p.price) + ').'
+      : 'I would like to order: ' + p.name + ' (' + (p.priceLabel || money(p.price)) + ').'),
+    '',
+    kind === 'digital'
+      ? 'Personal license / Commercial license ($49): '
+      : 'Color / options / notes: ',
+    '',
+  ].join('\n');
+
+  card.innerHTML =
+    '<div class="product-art" aria-hidden="true">' + p.icon + '</div>' +
+    '<div class="product-body">' +
+    '<h3></h3><p></p>' +
+    '<div class="product-meta"><span class="product-price"></span><span class="product-tag"></span></div>' +
+    '<a class="btn btn-primary"></a>' +
+    '</div>';
+
+  card.querySelector('h3').textContent = p.name;
+  card.querySelector('.product-body p').textContent = p.desc;
+  card.querySelector('.product-price').textContent = p.priceLabel || money(p.price).replace('.00', '');
+  card.querySelector('.product-tag').textContent = p.tag;
+
+  const btn = card.querySelector('a.btn');
+  btn.textContent = kind === 'digital' ? 'Buy file' : 'Order';
+  btn.href = mailtoLink(subject, body);
+
+  return card;
+}
+
+function initGrids() {
+  const catalogGrid = $('catalogGrid');
+  const digitalGrid = $('digitalGrid');
+  if (catalogGrid) CATALOG.forEach((p) => catalogGrid.appendChild(productCard(p, 'physical')));
+  if (digitalGrid) DIGITAL.forEach((p) => digitalGrid.appendChild(productCard(p, 'digital')));
+}
+
+/* ============ Stale service-worker cleanup ============
+ * An earlier app registered a cache-first service worker at this root scope.
+ * Unregister it (but leave tools/ scopes alone) so returning visitors always
+ * get the current storefront instead of a stale cached page. */
+function cleanupStaleServiceWorker() {
+  if (!('serviceWorker' in navigator)) return;
+  navigator.serviceWorker.getRegistrations().then((regs) => {
+    regs.forEach((reg) => {
+      if (!reg.scope.includes('/tools/')) reg.unregister();
     });
-
-    $('invoiceBtn').addEventListener('click', generateInvoice);
-    $('markAllPaidBtn').addEventListener('click', markAllOutstandingPaid);
-    $('closeInvoiceBtn').addEventListener('click', closeInvoice);
-    $('shareInvoiceBtn').addEventListener('click', shareInvoice);
-
-    ['invoiceFrom', 'invoiceTo'].forEach((id) => {
-      $(id).addEventListener('input', (e) => {
-        settings[id] = e.target.value;
-        saveSettings();
-      });
-    });
-
-    renderEntries();
-
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('sw.js').catch(() => {});
-    }
+  }).catch(() => {});
+  if (window.caches && caches.keys) {
+    caches.keys().then((keys) => {
+      keys.filter((k) => k === 'work-hours-v1').forEach((k) => caches.delete(k));
+    }).catch(() => {});
   }
+}
 
-  function loadEntries() {
-    try {
-      return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
-    } catch {
-      return [];
-    }
-  }
+/* ============ Boot ============ */
 
-  function saveEntries() {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
-  }
-
-  function loadSettings() {
-    try {
-      return JSON.parse(localStorage.getItem(SETTINGS_KEY)) || {};
-    } catch {
-      return {};
-    }
-  }
-
-  function saveSettings() {
-    localStorage.setItem(SETTINGS_KEY, JSON.stringify(settings));
-  }
-
-  function autoFillHours() {
-    const start = $('startTime').value;
-    const end = $('endTime').value;
-    if (!start || !end) return;
-    const [sh, sm] = start.split(':').map(Number);
-    const [eh, em] = end.split(':').map(Number);
-    let minutes = (eh * 60 + em) - (sh * 60 + sm);
-    if (minutes < 0) minutes += 24 * 60;
-    const hours = (minutes / 60).toFixed(2);
-    if (!$('hours').value || $('hours').dataset.auto === '1') {
-      $('hours').value = hours;
-      $('hours').dataset.auto = '1';
-    }
-  }
-
-  function onSubmit(e) {
-    e.preventDefault();
-    const id = $('entryId').value || cryptoRandomId();
-    const entry = {
-      id,
-      date: $('date').value,
-      startTime: $('startTime').value || null,
-      endTime: $('endTime').value || null,
-      hours: parseFloat($('hours').value) || 0,
-      rate: parseFloat($('rate').value) || 0,
-      description: $('description').value.trim(),
-      paid: $('paid').checked,
-      createdAt: Date.now(),
-    };
-
-    const existingIndex = entries.findIndex((x) => x.id === id);
-    if (existingIndex >= 0) {
-      entry.createdAt = entries[existingIndex].createdAt;
-      entries[existingIndex] = entry;
-    } else {
-      entries.unshift(entry);
-    }
-
-    saveEntries();
-    resetForm();
-    renderEntries();
-  }
-
-  function resetForm() {
-    form.reset();
-    $('entryId').value = '';
-    $('date').valueAsDate = new Date();
-    $('hours').dataset.auto = '';
-    formTitle.textContent = 'Add work entry';
-    saveBtn.textContent = 'Save entry';
-    cancelBtn.classList.add('hidden');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
-
-  function editEntry(id) {
-    const entry = entries.find((x) => x.id === id);
-    if (!entry) return;
-    $('entryId').value = entry.id;
-    $('date').value = entry.date;
-    $('startTime').value = entry.startTime || '';
-    $('endTime').value = entry.endTime || '';
-    $('hours').value = entry.hours;
-    $('rate').value = entry.rate;
-    $('description').value = entry.description || '';
-    $('paid').checked = !!entry.paid;
-    formTitle.textContent = 'Edit entry';
-    saveBtn.textContent = 'Update entry';
-    cancelBtn.classList.remove('hidden');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }
-
-  function deleteEntry(id) {
-    if (!confirm('Delete this entry?')) return;
-    entries = entries.filter((x) => x.id !== id);
-    saveEntries();
-    renderEntries();
-  }
-
-  function togglePaid(id) {
-    const entry = entries.find((x) => x.id === id);
-    if (!entry) return;
-    entry.paid = !entry.paid;
-    saveEntries();
-    renderEntries();
-  }
-
-  function renderEntries() {
-    const sorted = [...entries].sort((a, b) => (b.date || '').localeCompare(a.date || '') || b.createdAt - a.createdAt);
-
-    const filtered = sorted.filter((e) => {
-      if (activeFilter === 'paid') return e.paid;
-      if (activeFilter === 'unpaid') return !e.paid;
-      return true;
-    });
-
-    entriesList.innerHTML = '';
-    filtered.forEach((entry) => entriesList.appendChild(renderEntry(entry)));
-
-    emptyState.classList.toggle('hidden', filtered.length > 0);
-    if (filtered.length === 0 && entries.length > 0) {
-      emptyState.textContent = activeFilter === 'paid'
-        ? 'No paid entries yet.'
-        : 'No outstanding entries. Nice work.';
-    } else {
-      emptyState.textContent = 'No entries yet. Add your first one above.';
-    }
-
-    const unpaid = entries.filter((e) => !e.paid).reduce((sum, e) => sum + e.hours * e.rate, 0);
-    const paid = entries.filter((e) => e.paid).reduce((sum, e) => sum + e.hours * e.rate, 0);
-    outstandingTotal.textContent = formatMoney(unpaid);
-    paidTotal.textContent = formatMoney(paid);
-  }
-
-  function renderEntry(entry) {
-    const li = document.createElement('li');
-    li.className = 'entry' + (entry.paid ? ' paid' : '');
-
-    const main = document.createElement('div');
-    main.className = 'entry-main';
-
-    const dateEl = document.createElement('div');
-    dateEl.className = 'entry-date';
-    dateEl.textContent = formatDate(entry.date);
-    main.appendChild(dateEl);
-
-    const lineEl = document.createElement('div');
-    lineEl.className = 'entry-line';
-    const left = document.createElement('span');
-    left.textContent = `${formatHours(entry.hours)} × ${formatMoney(entry.rate)}/hr`;
-    const right = document.createElement('span');
-    right.className = 'entry-amount';
-    right.textContent = formatMoney(entry.hours * entry.rate);
-    lineEl.appendChild(left);
-    lineEl.appendChild(right);
-    main.appendChild(lineEl);
-
-    if (entry.startTime && entry.endTime) {
-      const timeEl = document.createElement('div');
-      timeEl.className = 'entry-time';
-      timeEl.textContent = `${formatTime(entry.startTime)} – ${formatTime(entry.endTime)}`;
-      main.appendChild(timeEl);
-    }
-
-    if (entry.description) {
-      const descEl = document.createElement('div');
-      descEl.className = 'entry-desc';
-      descEl.textContent = entry.description;
-      main.appendChild(descEl);
-    }
-
-    const badge = document.createElement('span');
-    badge.className = 'badge ' + (entry.paid ? 'paid' : 'unpaid');
-    badge.textContent = entry.paid ? 'Paid' : 'Unpaid';
-    main.appendChild(badge);
-
-    const actions = document.createElement('div');
-    actions.className = 'entry-actions';
-
-    const togglePaidBtn = document.createElement('button');
-    togglePaidBtn.type = 'button';
-    togglePaidBtn.className = 'toggle-paid';
-    togglePaidBtn.textContent = entry.paid ? 'Unpay' : 'Mark paid';
-    togglePaidBtn.addEventListener('click', () => togglePaid(entry.id));
-
-    const editBtn = document.createElement('button');
-    editBtn.type = 'button';
-    editBtn.textContent = 'Edit';
-    editBtn.addEventListener('click', () => editEntry(entry.id));
-
-    const deleteBtn = document.createElement('button');
-    deleteBtn.type = 'button';
-    deleteBtn.className = 'delete';
-    deleteBtn.textContent = 'Delete';
-    deleteBtn.addEventListener('click', () => deleteEntry(entry.id));
-
-    actions.appendChild(togglePaidBtn);
-    actions.appendChild(editBtn);
-    actions.appendChild(deleteBtn);
-
-    li.appendChild(main);
-    li.appendChild(actions);
-    return li;
-  }
-
-  function generateInvoice() {
-    const outstanding = entries
-      .filter((e) => !e.paid)
-      .sort((a, b) => (a.date || '').localeCompare(b.date || ''));
-
-    if (outstanding.length === 0) {
-      alert('No outstanding work to invoice.');
-      return;
-    }
-
-    const from = settings.invoiceFrom || 'Your name';
-    const to = settings.invoiceTo || 'Client';
-    const today = new Date();
-    const invoiceNumber = `INV-${today.getFullYear()}${String(today.getMonth() + 1).padStart(2, '0')}${String(today.getDate()).padStart(2, '0')}-${String(today.getHours()).padStart(2, '0')}${String(today.getMinutes()).padStart(2, '0')}`;
-    const total = outstanding.reduce((sum, e) => sum + e.hours * e.rate, 0);
-
-    const rows = outstanding.map((e) => {
-      const amount = e.hours * e.rate;
-      const desc = [
-        e.description || 'Work performed',
-        e.startTime && e.endTime ? `(${formatTime(e.startTime)}–${formatTime(e.endTime)})` : '',
-      ].filter(Boolean).join(' ');
-      return `
-        <tr>
-          <td>${formatDate(e.date)}</td>
-          <td>${escapeHtml(desc)}</td>
-          <td class="num">${formatHours(e.hours)}</td>
-          <td class="num">${formatMoney(e.rate)}</td>
-          <td class="num">${formatMoney(amount)}</td>
-        </tr>
-      `;
-    }).join('');
-
-    invoiceContent.innerHTML = `
-      <h1>Invoice</h1>
-      <div class="muted small">${escapeHtml(invoiceNumber)} · ${formatDate(today.toISOString().slice(0, 10))}</div>
-      <div class="meta">
-        <div>
-          <h3>From</h3>
-          <div>${escapeHtml(from)}</div>
-        </div>
-        <div>
-          <h3>Bill to</h3>
-          <div>${escapeHtml(to)}</div>
-        </div>
-      </div>
-      <table>
-        <thead>
-          <tr>
-            <th>Date</th>
-            <th>Description</th>
-            <th class="num">Hours</th>
-            <th class="num">Rate</th>
-            <th class="num">Amount</th>
-          </tr>
-        </thead>
-        <tbody>${rows}</tbody>
-      </table>
-      <div class="totals">
-        <table>
-          <tr><td>Subtotal</td><td class="num">${formatMoney(total)}</td></tr>
-          <tr class="total-row"><td>Total due</td><td class="num">${formatMoney(total)}</td></tr>
-        </table>
-      </div>
-    `;
-
-    invoiceModal.dataset.invoiceNumber = invoiceNumber;
-    invoiceModal.dataset.total = String(total);
-    invoiceModal.classList.remove('hidden');
-    document.body.style.overflow = 'hidden';
-  }
-
-  function closeInvoice() {
-    invoiceModal.classList.add('hidden');
-    document.body.style.overflow = '';
-  }
-
-  async function shareInvoice() {
-    const invoiceNumber = invoiceModal.dataset.invoiceNumber || 'invoice';
-    const total = parseFloat(invoiceModal.dataset.total || '0');
-    const text = `${invoiceNumber} — Total due: ${formatMoney(total)}\n\n${invoiceContent.innerText}`;
-
-    if (navigator.share) {
-      try {
-        await navigator.share({ title: invoiceNumber, text });
-        return;
-      } catch {
-        // user cancelled or share failed; fall through to print
-      }
-    }
-    window.print();
-  }
-
-  function markAllOutstandingPaid() {
-    const count = entries.filter((e) => !e.paid).length;
-    if (count === 0) {
-      alert('Nothing outstanding to mark paid.');
-      return;
-    }
-    if (!confirm(`Mark all ${count} outstanding entries as paid?`)) return;
-    entries.forEach((e) => { e.paid = true; });
-    saveEntries();
-    renderEntries();
-  }
-
-  function formatMoney(n) {
-    return '$' + (Number(n) || 0).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-  }
-
-  function formatHours(n) {
-    const v = Number(n) || 0;
-    return (v % 1 === 0 ? v.toFixed(0) : v.toFixed(2)) + ' hr' + (v === 1 ? '' : 's');
-  }
-
-  function formatDate(iso) {
-    if (!iso) return '';
-    const [y, m, d] = iso.split('-').map(Number);
-    const date = new Date(y, m - 1, d);
-    return date.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric', year: 'numeric' });
-  }
-
-  function formatTime(t) {
-    if (!t) return '';
-    const [h, m] = t.split(':').map(Number);
-    const d = new Date();
-    d.setHours(h, m, 0, 0);
-    return d.toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
-  }
-
-  function escapeHtml(s) {
-    return String(s)
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#39;');
-  }
-
-  function cryptoRandomId() {
-    if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
-    return 'id-' + Math.random().toString(36).slice(2) + Date.now().toString(36);
-  }
-})();
+initQuote();
+initGrids();
+cleanupStaleServiceWorker();

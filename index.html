@@ -2,117 +2,239 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
-  <meta name="theme-color" content="#0a84ff" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="apple-mobile-web-app-title" content="Hours" />
-  <link rel="apple-touch-icon" href="icon-180.png" />
-  <link rel="manifest" href="manifest.json" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="3D Printing World — custom 3D printing with zero material fees. Instant quotes, print-on-demand products, replacement parts, prototyping, and premium STL files. You pay for precision, not plastic." />
+  <meta name="theme-color" content="#0f1420" />
+  <meta property="og:title" content="3D Printing World — $0 Material Fees, Ever" />
+  <meta property="og:description" content="Custom 3D printing priced on machine time only. Materials are always $0. Get an instant quote." />
+  <meta property="og:type" content="website" />
+  <title>3D Printing World — Custom 3D Printing, $0 Material Fees</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='80' font-size='80'%3E%E2%96%B2%3C/text%3E%3C/svg%3E" />
   <link rel="stylesheet" href="styles.css" />
-  <title>Work Hours & Invoicing</title>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "LocalBusiness",
+    "name": "3D Printing World Inc",
+    "description": "Custom 3D printing service with zero material fees. Print-on-demand products, prototyping, replacement parts, and digital STL files.",
+    "email": "3dprintingworldinc@gmail.com",
+    "priceRange": "$7-$149"
+  }
+  </script>
 </head>
 <body>
-  <header class="topbar">
-    <h1>Hours</h1>
-    <div class="summary">
-      <div><span class="label">Outstanding</span><span id="outstandingTotal" class="amount">$0.00</span></div>
-      <div><span class="label">Paid</span><span id="paidTotal" class="amount muted">$0.00</span></div>
-    </div>
+  <header class="site-header">
+    <nav class="nav container">
+      <a class="brand" href="#top">
+        <span class="brand-mark" aria-hidden="true">▲</span>
+        <span>3D Printing <strong>World</strong></span>
+      </a>
+      <div class="nav-links">
+        <a href="#quote">Instant Quote</a>
+        <a href="#shop">Shop</a>
+        <a href="#digital">STL Files</a>
+        <a href="#services">Services</a>
+        <a href="#faq">FAQ</a>
+        <a class="btn btn-small" href="#quote">Get a price</a>
+      </div>
+    </nav>
   </header>
 
-  <main>
-    <section class="card">
-      <h2 id="formTitle">Add work entry</h2>
-      <form id="entryForm" autocomplete="off">
-        <input type="hidden" id="entryId" />
+  <main id="top">
 
-        <label>
-          Date
-          <input type="date" id="date" required />
-        </label>
-
-        <div class="row">
-          <label>
-            Start time
-            <input type="time" id="startTime" />
-          </label>
-          <label>
-            End time
-            <input type="time" id="endTime" />
-          </label>
+    <!-- ============ HERO ============ -->
+    <section class="hero">
+      <div class="container hero-inner">
+        <p class="eyebrow">Custom 3D printing, done right</p>
+        <h1>You pay for precision.<br /><span class="accent">Not plastic.</span></h1>
+        <p class="lede">
+          Every other print shop charges you by the gram. We don't. Materials are
+          <strong>$0 on every order, forever</strong> — you pay only for machine time
+          and craftsmanship. Big, heavy, solid prints cost us nothing extra, so they
+          don't cost you extra either.
+        </p>
+        <div class="hero-actions">
+          <a class="btn btn-primary" href="#quote">Get an instant quote</a>
+          <a class="btn btn-ghost" href="#shop">Browse products</a>
         </div>
-
-        <div class="row">
-          <label>
-            Hours worked
-            <input type="number" id="hours" inputmode="decimal" step="0.01" min="0" placeholder="0.00" required />
-          </label>
-          <label>
-            Hourly rate ($)
-            <input type="number" id="rate" inputmode="decimal" step="0.01" min="0" placeholder="0.00" required />
-          </label>
-        </div>
-
-        <label>
-          Description (optional)
-          <input type="text" id="description" maxlength="200" placeholder="What did you work on?" />
-        </label>
-
-        <label class="checkbox">
-          <input type="checkbox" id="paid" />
-          <span>Already paid</span>
-        </label>
-
-        <div class="actions">
-          <button type="submit" id="saveBtn" class="primary">Save entry</button>
-          <button type="button" id="cancelBtn" class="ghost hidden">Cancel</button>
-        </div>
-      </form>
+        <ul class="trust-strip" aria-label="Guarantees">
+          <li><strong>$0</strong> material fees, always</li>
+          <li><strong>48 h</strong> rush turnaround available</li>
+          <li><strong>3–5 d</strong> standard ship time</li>
+          <li><strong>100%</strong> reprint guarantee</li>
+        </ul>
+      </div>
     </section>
 
-    <section class="card">
-      <div class="entries-header">
-        <h2>Entries</h2>
-        <div class="filters">
-          <button type="button" class="filter active" data-filter="all">All</button>
-          <button type="button" class="filter" data-filter="unpaid">Unpaid</button>
-          <button type="button" class="filter" data-filter="paid">Paid</button>
+    <!-- ============ QUOTE CALCULATOR ============ -->
+    <section id="quote" class="section">
+      <div class="container">
+        <h2>Instant quote</h2>
+        <p class="section-sub">Priced on machine time only. Watch the materials line — it never moves.</p>
+
+        <div class="quote-grid">
+          <form id="quoteForm" class="card quote-form" autocomplete="off">
+            <label>
+              Estimated print time (hours)
+              <input type="number" id="qHours" min="0.5" max="200" step="0.5" value="6" required />
+              <span class="hint">Not sure? Pick the closest size below and we'll estimate it.</span>
+            </label>
+
+            <div class="size-presets" role="group" aria-label="Size presets">
+              <button type="button" class="chip" data-hours="2">Small · fits in your hand · ~2 h</button>
+              <button type="button" class="chip" data-hours="6">Medium · mug-to-helmet · ~6 h</button>
+              <button type="button" class="chip" data-hours="14">Large · full helmet / big planter · ~14 h</button>
+              <button type="button" class="chip" data-hours="30">XL · multi-part builds · ~30 h</button>
+            </div>
+
+            <label>
+              Quality
+              <select id="qQuality">
+                <option value="draft">Draft — fast &amp; economical (−15%)</option>
+                <option value="standard" selected>Standard — great for most parts</option>
+                <option value="fine">Fine — display-quality detail (+35%)</option>
+              </select>
+            </label>
+
+            <label>
+              Quantity
+              <input type="number" id="qQty" min="1" max="500" step="1" value="1" required />
+              <span class="hint">5+ units save 10% · 20+ units save 20%</span>
+            </label>
+
+            <label class="checkbox">
+              <input type="checkbox" id="qRush" />
+              <span>Rush it — 48-hour turnaround (×1.75)</span>
+            </label>
+          </form>
+
+          <div class="card quote-result" aria-live="polite">
+            <h3>Your quote</h3>
+            <dl class="quote-lines">
+              <div><dt>Machine time</dt><dd id="lineMachine">$0.00</dd></div>
+              <div class="materials-line"><dt>Materials</dt><dd id="lineMaterials">$0.00</dd></div>
+              <div><dt>Finishing &amp; QC</dt><dd>Included</dd></div>
+              <div id="lineDiscountRow" class="hidden"><dt>Volume discount</dt><dd id="lineDiscount">—</dd></div>
+              <div id="lineRushRow" class="hidden"><dt>Rush (48 h)</dt><dd id="lineRush">—</dd></div>
+              <div><dt>Shipping</dt><dd id="lineShipping">$6.00</dd></div>
+            </dl>
+            <div class="quote-total">
+              <span>Total</span>
+              <span id="lineTotal">$0.00</span>
+            </div>
+            <p class="hint" id="quoteNote"></p>
+            <a class="btn btn-primary btn-block" id="orderQuoteBtn" href="#">Order this print</a>
+            <p class="hint">Opens an email with your quote pre-filled. Attach your model file (STL/3MF/STEP) or describe what you need — we can design it.</p>
+          </div>
         </div>
       </div>
-      <ul id="entries" class="entries"></ul>
-      <p id="emptyState" class="empty">No entries yet. Add your first one above.</p>
     </section>
 
-    <section class="card invoice-card">
-      <h2>Invoice outstanding work</h2>
-      <p class="muted small">Generates an invoice for every entry that has not been marked paid.</p>
-      <div class="row">
-        <label>
-          Your name / business
-          <input type="text" id="invoiceFrom" placeholder="Your name" />
-        </label>
-        <label>
-          Bill to
-          <input type="text" id="invoiceTo" placeholder="Client name" />
-        </label>
+    <!-- ============ CATALOG ============ -->
+    <section id="shop" class="section section-alt">
+      <div class="container">
+        <h2>Shop — printed on demand</h2>
+        <p class="section-sub">
+          Nothing sits in a warehouse. Your order starts printing when you place it —
+          which is how we keep prices this low on pieces this substantial.
+        </p>
+        <div id="catalogGrid" class="product-grid"></div>
       </div>
-      <div class="actions">
-        <button type="button" id="invoiceBtn" class="primary">Create invoice</button>
-        <button type="button" id="markAllPaidBtn" class="ghost">Mark all as paid</button>
+    </section>
+
+    <!-- ============ DIGITAL FILES ============ -->
+    <section id="digital" class="section">
+      <div class="container">
+        <h2>STL files — print it yourself</h2>
+        <p class="section-sub">
+          Own a printer? Buy the design. Tested, pre-sliced profiles included,
+          delivered to your inbox. Commercial license available on every file.
+        </p>
+        <div id="digitalGrid" class="product-grid"></div>
+        <p class="hint center">Commercial license — sell prints of any of our designs: <strong>$49 per file</strong>. Mention it in your order email.</p>
+      </div>
+    </section>
+
+    <!-- ============ SERVICES ============ -->
+    <section id="services" class="section section-alt">
+      <div class="container">
+        <h2>Services</h2>
+        <div class="service-grid">
+          <div class="card service">
+            <h3>Replacement parts</h3>
+            <p>Broken bracket, knob, clip, or gear? Send a photo and measurements — we reverse-engineer it and print it stronger than the original. <strong>From $25.</strong></p>
+          </div>
+          <div class="card service">
+            <h3>Prototyping for business</h3>
+            <p>Same-week functional prototypes with $0 material cost — iterate as many times as you need without the per-gram anxiety. <strong>Machine time from $25/hr, CAD design $60/hr.</strong></p>
+          </div>
+          <div class="card service">
+            <h3>Cosplay &amp; props</h3>
+            <p>Helmets, armor, full-scale props — the big pieces other shops price by the kilogram. Ours are priced by print time only. <strong>Helmets from $149.</strong></p>
+          </div>
+          <div class="card service">
+            <h3>Small-batch production</h3>
+            <p>20–500 units of your part, printed overnight on a rolling schedule. Volume discounts up to 20% built into every quote. <strong>Use the calculator above.</strong></p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ HOW IT WORKS ============ -->
+    <section class="section">
+      <div class="container">
+        <h2>How it works</h2>
+        <ol class="steps">
+          <li><strong>Quote.</strong> Use the calculator or email us your file. You get a fixed price — no surprises, no per-gram math.</li>
+          <li><strong>Print.</strong> Your job is queued on our machine. Rush orders jump the line and ship within 48 hours.</li>
+          <li><strong>Ship.</strong> Inspected, packed, and shipped in 3–5 days. If anything's wrong, we reprint it free — materials cost us nothing, so we never argue.</li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- ============ FAQ ============ -->
+    <section id="faq" class="section section-alt">
+      <div class="container">
+        <h2>FAQ</h2>
+        <details>
+          <summary>How can materials really be $0?</summary>
+          <p>Our filament supply costs us nothing, so we pass that straight through. You pay for machine time, expertise, and finishing — the parts of the job that actually determine quality.</p>
+        </details>
+        <details>
+          <summary>What if my print fails or arrives damaged?</summary>
+          <p>We reprint it free, no questions. A reprint costs us only time, so our guarantee is the strongest in the industry.</p>
+        </details>
+        <details>
+          <summary>What file formats do you accept?</summary>
+          <p>STL, 3MF, OBJ, and STEP. No file? Send photos and measurements — our design service starts at $60/hr and most small parts take under an hour to model.</p>
+        </details>
+        <details>
+          <summary>How do I pay?</summary>
+          <p>You'll receive an itemized invoice by email with payment instructions once your quote is confirmed. Nothing is charged until you approve the final price.</p>
+        </details>
+        <details>
+          <summary>Do you ship everywhere?</summary>
+          <p>We ship anywhere your postal service reaches. Shipping is a flat $6 and free on orders over $60.</p>
+        </details>
+      </div>
+    </section>
+
+    <!-- ============ CONTACT ============ -->
+    <section id="contact" class="section">
+      <div class="container center">
+        <h2>Ready when you are</h2>
+        <p class="section-sub">One email starts the job. Files, photos, ideas — send whatever you have.</p>
+        <a class="btn btn-primary btn-large" href="mailto:3dprintingworldinc@gmail.com?subject=Print%20request">3dprintingworldinc@gmail.com</a>
       </div>
     </section>
   </main>
 
-  <div id="invoiceModal" class="modal hidden" role="dialog" aria-modal="true" aria-labelledby="invoiceTitle">
-    <div class="modal-content">
-      <div class="modal-actions no-print">
-        <button type="button" id="shareInvoiceBtn" class="primary">Share / Save PDF</button>
-        <button type="button" id="closeInvoiceBtn" class="ghost">Close</button>
-      </div>
-      <div id="invoiceContent" class="invoice"></div>
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <span>© 2026 3D Printing World Inc</span>
+      <span>Materials: <strong>$0.00</strong> — as always.</span>
     </div>
-  </div>
+  </footer>
 
   <script src="app.js"></script>
 </body>
